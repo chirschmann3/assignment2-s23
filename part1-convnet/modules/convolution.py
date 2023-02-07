@@ -76,11 +76,12 @@ class Conv2D:
         x = np.pad(x, (self.padding, self.padding), 'constant', constant_values=0)
         for img in range(x.shape[0]):
             for kernel in range(self.out_channels):
-                for h in range(H_out):
-                    for w in range(W_out):
-                        out[img, kernel, h, w] = 1
-
-
+                for r in range(H_out):
+                    for c in range(W_out):
+                        x_temp = x[img, :, r * self.stride:r * self.stride + self.kernel_size,
+                                   c * self.stride:c * self.stride + self.kernel_size]
+                        pixel_temp = np.sum(np.multiply(x_temp, self.weight[kernel, :, :, :]))
+                        out[img, kernel, r, c] = pixel_temp + self.bias[kernel]
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
