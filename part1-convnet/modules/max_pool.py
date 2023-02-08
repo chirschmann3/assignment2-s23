@@ -78,6 +78,8 @@ class MaxPooling:
         #       1) You may implement the process with loops                     #
         #       2) You may find np.unravel_index useful                             #
         #############################################################################
+        self.dx = np.zeros(x.shape)
+
         for img in range(x.shape[0]):
             for kernel in range(x.shape[1]):
                 for r in range(H_out):
@@ -86,7 +88,7 @@ class MaxPooling:
                                             c * self.stride:c * self.stride + self.kernel_size]
                         # get argmax index and location
                         i = receptive_field.argmax()
-                        matrix_location = np.unravel_index(i, x.shape)
+                        matrix_location = np.unravel_index(i, receptive_field.shape)
                         max_num = receptive_field[matrix_location]
 
                         # use above to update dx with d_out
