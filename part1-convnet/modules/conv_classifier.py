@@ -89,8 +89,6 @@ class ConvNet:
         :return: nothing but dx, dw, and db of all modules are updated
         """
         #############################################################################
-        # TODO:                                                                     #
-        #    1) Implement backward pass of the model                                #
         #############################################################################
         self.criterion.backward()
         dx = self.criterion.dx
