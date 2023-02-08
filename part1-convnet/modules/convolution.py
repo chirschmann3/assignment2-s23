@@ -69,19 +69,34 @@ class Conv2D:
         # Hint: 1) You may use np.pad for padding.                                  #
         #       2) You may implement the convolution with loops                     #
         #############################################################################
-        H_out = (x.shape[2] + (self.padding * 2) - self.kernel_size) / self.stride + 1
-        W_out = (x.shape[3] + (self.padding * 2) - self.kernel_size) / self.stride + 1
+        H_out = (x.shape[2] + (self.padding * 2) - self.kernel_size) // self.stride + 1
+        W_out = (x.shape[3] + (self.padding * 2) - self.kernel_size) // self.stride + 1
         out = np.zeros([x.shape[0], self.out_channels, H_out, W_out])
 
-        x = np.pad(x, (self.padding, self.padding), 'constant', constant_values=0)
+        x_padded = np.pad(x, ((0, 0), (0, 0), (self.padding, self.padding), (self.padding, self.padding)),
+                   'constant', constant_values=0)
         for img in range(x.shape[0]):
             for kernel in range(self.out_channels):
                 for r in range(H_out):
                     for c in range(W_out):
-                        x_temp = x[img, :, r * self.stride:r * self.stride + self.kernel_size,
+                        # get "snapshot" to apply kernel to
+                        receptive_field = x_padded[img, :, r * self.stride:r * self.stride + self.kernel_size,
                                    c * self.stride:c * self.stride + self.kernel_size]
-                        pixel_temp = np.sum(np.multiply(x_temp, self.weight[kernel, :, :, :]))
-                        out[img, kernel, r, c] = pixel_temp + self.bias[kernel]
+                        # elemwise multiply + sum with kernel
+                        output_temp = np.sum(np.multiply(receptive_field, self.weight[kernel, :, :, :]))
+                        out[img, kernel, r, c] = output_temp + self.bias[kernel]
+
+        # x_padded = np.pad(x, ((0,0), (0,0), (self.padding, self.padding), (self.padding, self.padding)),
+        #            'constant', constant_values=0)
+        # for img in range(x_padded.shape[0]):
+        #     img_temp = x_padded[img]
+        #     s_c, s_h, s_w = img_temp.strides
+        #     img_vectorized = np.lib.stride_tricks.as_strided(img_temp,
+        #                                                      shape=(H_out, W_out, self.in_channels,
+        #                                                             self.kernel_size, self.kernel_size),
+        #                                                      strides=(s_h*self.stride, s_w*self.stride, s_c, s_h, s_w),
+        #                                                      writeable=False)
+
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
@@ -101,6 +116,34 @@ class Conv2D:
         #       1) You may implement the convolution with loops                     #
         #       2) don't forget padding when computing dx                           #
         #############################################################################
+        self.dx = np.zeros_like(x)
+        self.dw = np.zeros_like(self.weight)
+        self.db = np.zeros_like(self.bias)
+
+        x_padded = np.pad(x, ((0, 0), (0, 0), (self.padding, self.padding), (self.padding, self.padding)),
+                   'constant', constant_values=0)
+        dx_padded = np.zeros_like(x_padded)
+
+        for img in range(x.shape[0]):
+            for kernel in range(self.out_channels):
+                for r in range(x.shape[2]):
+                    for c in range(x.shape[3]):
+                        # get single d_out value & multiply by input snapshot
+                        dw_field = dout[img, kernel, r, c] * x_padded[img, :, r:r + self.kernel_size,
+                                                                      c:c + self.kernel_size]
+                        # all above get added together in the kernel
+                        self.dw[kernel, :, :, :] += dw_field
+
+                        # single d_out and multiply by kernel weights
+                        dx_field = dout[img, kernel, r, c] * self.weight[kernel, :, :, :]
+                        # "stamp" onto appropriate location in dx_padded
+                        dx_padded[img, :, r:r + self.kernel_size, c:c + self.kernel_size] += dx_field
+
+                        # Add d_out to appropriate kernel
+                        self.db[kernel] += dout[img, kernel, r, c]
+
+        # must remove padding on dx
+        self.dx = dx_padded[:, :, self.padding:(x.shape[2])-self.padding, self.padding:(x.shape[3])-self.padding]
 
         #############################################################################
         #                              END OF YOUR CODE                             #
