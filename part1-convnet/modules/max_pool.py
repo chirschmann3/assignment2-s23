@@ -46,7 +46,19 @@ class MaxPooling:
         # Hint:                                                                     #
         #       1) You may implement the process with loops                         #
         #############################################################################
+        H_out = (x.shape[2] - self.kernel_size) // self.stride + 1
+        W_out = (x.shape[3] - self.kernel_size) // self.stride + 1
+        out = np.zeros([x.shape[0], x.shape[1], H_out, W_out])
 
+        for img in range(x.shape[0]):
+            for kernel in range(x.shape[1]):
+                for r in range(H_out):
+                    for c in range(W_out):
+                        # get "snapshot" to apply pooling to
+                        receptive_field = x[img, :, r * self.stride:r * self.stride + self.kernel_size,
+                                            c * self.stride:c * self.stride + self.kernel_size]
+                        # get max of receptive field and put in appropriate place in output
+                        out[img, kernel, r, c] = np.max(receptive_field)
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
@@ -66,7 +78,21 @@ class MaxPooling:
         #       1) You may implement the process with loops                     #
         #       2) You may find np.unravel_index useful                             #
         #############################################################################
+        for img in range(x.shape[0]):
+            for kernel in range(x.shape[1]):
+                for r in range(H_out):
+                    for c in range(W_out):
+                        receptive_field = x[img, kernel, r * self.stride:r * self.stride + self.kernel_size,
+                                            c * self.stride:c * self.stride + self.kernel_size]
+                        # get argmax index and location
+                        i = receptive_field.argmax()
+                        matrix_location = np.unravel_index(i, x.shape)
+                        max_num = receptive_field[matrix_location]
 
+                        # use above to update dx with d_out
+                        temp_dx = dout[img, kernel, r, c] * max_num
+                        self.dx[img, kernel, r * self.stride:r * self.stride + self.kernel_size,
+                                             c * self.stride:c * self.stride + self.kernel_size] += temp_dx
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
