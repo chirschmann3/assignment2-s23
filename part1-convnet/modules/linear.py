@@ -57,7 +57,8 @@ class Linear:
         # TODO: Implement the forward pass.                                         #
         #    HINT: You may want to flatten the input first                          #
         #############################################################################
-
+        x_flat = np.reshape(x, (x.shape[0], self.in_dim))    # shape is numIMGxin_dim (10x8192)
+        out = np.matmul(self.weight.transpose(), x_flat.transpose()) + self. bias  # shape numIMGxin_dim @ in_dimxnumIMG
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
