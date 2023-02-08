@@ -73,7 +73,6 @@ class ConvNet:
         probs = None
         loss = None
         #############################################################################
-
         #############################################################################
         for i in range(len(self.modules)):
             x = self.modules[i].forward(x)
@@ -93,7 +92,12 @@ class ConvNet:
         # TODO:                                                                     #
         #    1) Implement backward pass of the model                                #
         #############################################################################
+        self.criterion.backward()
+        dx = self.criterion.dx
 
+        for i in range(len(self.modules)-1, -1, -1):
+            self.modules[i].backward(dx)
+            dx = self.modules[i].dx
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
