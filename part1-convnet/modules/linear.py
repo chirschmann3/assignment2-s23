@@ -76,7 +76,7 @@ class Linear:
         # TODO: Implement the linear backward pass.                                 #
         #############################################################################
         x_flat = np.reshape(x, (x.shape[0], self.in_dim))  # shape is Nxin_dim (10x8192)
-        self.dw = np.matmul(dout, x_flat)                  # NxN @ Nxin_dim = Nxin_dim
+        self.dw = np.matmul(dout, x_flat).transpose()      # NxN @ Nxin_dim = Nxin_dim - need to transpose this
 
         dL_dx = np.matmul(self.weight, dout)   #out_dimxN @ NxN = out_dimxN
         self.dx = np.reshape(dL_dx, x.shape)   #Nxkernxrxc
