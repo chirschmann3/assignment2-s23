@@ -89,12 +89,12 @@ class MaxPooling:
                         # get argmax index and location
                         i = receptive_field.argmax()
                         matrix_location = np.unravel_index(i, receptive_field.shape)
-                        max_num = receptive_field[matrix_location]
 
-                        # use above to update dx with d_out
-                        temp_dx = dout[img, kernel, r, c] * max_num
+                        # use above to update dx with d_out at the correct location
+                        dout_mat = np.zeros_like(receptive_field)
+                        dout_mat[matrix_location] = dout[img, kernel, r, c]
                         self.dx[img, kernel, r * self.stride:r * self.stride + self.kernel_size,
-                                             c * self.stride:c * self.stride + self.kernel_size] += temp_dx
+                                             c * self.stride:c * self.stride + self.kernel_size] += dout_mat
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
