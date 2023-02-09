@@ -58,7 +58,7 @@ class Linear:
         #    HINT: You may want to flatten the input first                          #
         #############################################################################
         x_flat = np.reshape(x, (x.shape[0], self.in_dim))    # shape is numIMGxin_dim (10x8192)
-        out = np.matmul(self.weight.transpose(), x_flat.transpose()) + self. bias  # shape numIMGxin_dim @ in_dimxnumIMG
+        out = np.matmul(self.weight.T, x_flat.T).T + self.bias  # shape numIMGxin_dim @ in_dimxnumIMG
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
@@ -76,9 +76,9 @@ class Linear:
         # TODO: Implement the linear backward pass.                                 #
         #############################################################################
         x_flat = np.reshape(x, (x.shape[0], self.in_dim))  # shape is Nxin_dim (10x8192)
-        self.dw = np.matmul(dout, x_flat).transpose()      # NxN @ Nxin_dim = Nxin_dim - need to transpose this
+        self.dw = np.matmul(x_flat.T, dout)                # indimxN @ NxN = indimxN
 
-        dL_dx = np.matmul(self.weight, dout)   #out_dimxN @ NxN = out_dimxN
+        dL_dx = np.matmul(dout, self.weight.T)   #NxN @ Nxindim = Nxindim
         self.dx = np.reshape(dL_dx, x.shape)   #Nxkernxrxc
 
         self.db = np.sum(dout, axis=0)         #Nx1
