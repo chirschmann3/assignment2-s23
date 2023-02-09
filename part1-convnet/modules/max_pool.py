@@ -55,7 +55,7 @@ class MaxPooling:
                 for r in range(H_out):
                     for c in range(W_out):
                         # get "snapshot" to apply pooling to
-                        receptive_field = x[img, :, r * self.stride:r * self.stride + self.kernel_size,
+                        receptive_field = x[img, kernel, r * self.stride:r * self.stride + self.kernel_size,
                                             c * self.stride:c * self.stride + self.kernel_size]
                         # get max of receptive field and put in appropriate place in output
                         out[img, kernel, r, c] = np.max(receptive_field)
