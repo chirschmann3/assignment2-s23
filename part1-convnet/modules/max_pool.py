@@ -42,9 +42,6 @@ class MaxPooling:
         """
         out = None
         #############################################################################
-        # TODO: Implement the max pooling forward pass.                             #
-        # Hint:                                                                     #
-        #       1) You may implement the process with loops                         #
         #############################################################################
         H_out = (x.shape[2] - self.kernel_size) // self.stride + 1
         W_out = (x.shape[3] - self.kernel_size) // self.stride + 1
@@ -73,10 +70,6 @@ class MaxPooling:
         """
         x, H_out, W_out = self.cache
         #############################################################################
-        # TODO: Implement the max pooling backward pass.                            #
-        # Hint:                                                                     #
-        #       1) You may implement the process with loops                     #
-        #       2) You may find np.unravel_index useful                             #
         #############################################################################
         self.dx = np.zeros(x.shape)
 

@@ -65,9 +65,6 @@ class Conv2D:
         """
         out = None
         #############################################################################
-        # TODO: Implement the convolution forward pass.                             #
-        # Hint: 1) You may use np.pad for padding.                                  #
-        #       2) You may implement the convolution with loops                     #
         #############################################################################
         H_out = (x.shape[2] + (self.padding * 2) - self.kernel_size) // self.stride + 1
         W_out = (x.shape[3] + (self.padding * 2) - self.kernel_size) // self.stride + 1
@@ -111,10 +108,6 @@ class Conv2D:
         """
         x = self.cache
         #############################################################################
-        # TODO: Implement the convolution backward pass.                            #
-        # Hint:                                                                     #
-        #       1) You may implement the convolution with loops                     #
-        #       2) don't forget padding when computing dx                           #
         #############################################################################
         self.dx = np.zeros_like(x)
         self.dw = np.zeros_like(self.weight)

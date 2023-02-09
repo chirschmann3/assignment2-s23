@@ -39,8 +39,7 @@ class SGD(_BaseOptimizer):
         for idx, m in enumerate(model.modules):
             if hasattr(m, 'weight'):
                 #############################################################################
-                # TODO:                                                                     #
-                #    1) Momentum updates for weights                                        #
+
                 #############################################################################
                 veloc = self.momentum * self.grad_tracker[idx]['dw'] - self.learning_rate * m.dw
                 m.weight += veloc
@@ -51,8 +50,7 @@ class SGD(_BaseOptimizer):
                 #############################################################################
             if hasattr(m, 'bias'):
                 #############################################################################
-                # TODO:                                                                     #
-                #    1) Momentum updates for bias                                           #
+
                 #############################################################################
                 veloc = self.momentum * self.grad_tracker[idx]['db'] - self.learning_rate * m.db
                 m.bias += veloc
