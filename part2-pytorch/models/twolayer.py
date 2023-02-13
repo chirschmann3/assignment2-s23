@@ -33,13 +33,13 @@ class TwoLayerNet(nn.Module):
         """
         super(TwoLayerNet, self).__init__()
         #############################################################################
-        # TODO: Initialize the TwoLayerNet, use sigmoid activation between layers   #
+
         #############################################################################
         # w1 = torch.randn((input_dim, hidden_size), requires_grad=True)
         # w2 = torch.randn((hidden_size, num_classes), requires_grad=True)
 
         self.ll1 = nn.Linear(input_dim, hidden_size)
-        self.activation = torch.nn.Sigmoid()
+        self.activation = nn.Sigmoid()
         self.ll2 = nn.Linear(hidden_size, num_classes)
         #############################################################################
         #                              END OF YOUR CODE                             #
@@ -48,9 +48,9 @@ class TwoLayerNet(nn.Module):
     def forward(self, x):
         out = None
         #############################################################################
-        # TODO: Implement forward pass of the network                               #
+
         #############################################################################
-        x = self.ll1(x)
+        x = self.ll1(x.view(x.shape[0], -1))
         x = self.activation(x)
         out = self.ll2(x)
         #############################################################################
