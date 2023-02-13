@@ -87,15 +87,13 @@ def train(epoch, data_loader, model, optimizer, criterion):
             target = target.cuda()
 
         #############################################################################
-        # TODO: Complete the body of training loop                                  #
-        #       1. forward data batch to the model                                  #
-        #       2. Compute batch loss                                               #
-        #       3. Compute gradients and update model parameters                    #
+
         #############################################################################
+        optimizer.zero_grad()
+
         out = model.forward(data)
         loss = criterion(out, target)
 
-        optimizer.zero_grad()
         loss.backward()
         optimizer.step()
         #############################################################################
@@ -131,10 +129,11 @@ def validate(epoch, val_loader, model, criterion):
             data = data.cuda()
             target = target.cuda()
         #############################################################################
-        # TODO: Complete the body of training loop                                  #
-        #       HINT: torch.no_grad()                                               #
-        #############################################################################
 
+        #############################################################################
+        with torch.no_grad():
+            out = model.forward(data)
+            loss = criterion(out, target)
         #############################################################################
         #                              END OF YOUR CODE                             #
         #############################################################################
