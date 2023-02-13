@@ -35,9 +35,6 @@ class TwoLayerNet(nn.Module):
         #############################################################################
 
         #############################################################################
-        # w1 = torch.randn((input_dim, hidden_size), requires_grad=True)
-        # w2 = torch.randn((hidden_size, num_classes), requires_grad=True)
-
         self.ll1 = nn.Linear(input_dim, hidden_size)
         self.activation = nn.Sigmoid()
         self.ll2 = nn.Linear(hidden_size, num_classes)
@@ -50,7 +47,8 @@ class TwoLayerNet(nn.Module):
         #############################################################################
 
         #############################################################################
-        x = self.ll1(x.view(x.shape[0], -1))
+        x = torch.flatten(x, 1)
+        x = self.ll1(x)
         x = self.activation(x)
         out = self.ll2(x)
         #############################################################################
