@@ -30,8 +30,6 @@ class VanillaCNN(nn.Module):
         #############################################################################
 
         #############################################################################
-        infeat = 500
-
         self.conv = nn.Conv2d(3, 32, 7, stride=1, padding=0)
         self.activation = nn.ReLU()
         self.pool = nn.MaxPool2d(2, stride=2)
