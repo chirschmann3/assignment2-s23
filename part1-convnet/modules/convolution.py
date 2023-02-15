@@ -83,8 +83,7 @@ class Conv2D:
                         output_temp = np.sum(np.multiply(receptive_field, self.weight[kernel, :, :, :]))
                         out[img, kernel, r, c] = output_temp + self.bias[kernel]
 
-        # x_padded = np.pad(x, ((0,0), (0,0), (self.padding, self.padding), (self.padding, self.padding)),
-        #            'constant', constant_values=0)
+        # out_trial = np.zeros([x.shape[0], self.out_channels, H_out, W_out])
         # for img in range(x_padded.shape[0]):
         #     img_temp = x_padded[img]
         #     s_c, s_h, s_w = img_temp.strides
@@ -93,6 +92,9 @@ class Conv2D:
         #                                                             self.kernel_size, self.kernel_size),
         #                                                      strides=(s_h*self.stride, s_w*self.stride, s_c, s_h, s_w),
         #                                                      writeable=False)
+        #     filt_apply_temp = np.multiply(img_vectorized, self.weight)    #32x32x3x5x5 * 32x3x5x5
+        #     out_trial[img] += filt_apply_temp
+
 
         #############################################################################
         #                              END OF YOUR CODE                             #
@@ -136,7 +138,7 @@ class Conv2D:
                         self.db[kernel] += dout[img, kernel, r, c]
 
         # must remove padding on dx
-        self.dx = dx_padded[:, :, self.padding:(x.shape[2])-self.padding, self.padding:(x.shape[3])-self.padding]
+        self.dx = dx_padded[:, :, self.padding:(x.shape[2])+self.padding, self.padding:(x.shape[3])+self.padding]
 
         #############################################################################
         #                              END OF YOUR CODE                             #
