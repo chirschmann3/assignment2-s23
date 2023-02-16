@@ -48,9 +48,9 @@ class MaxPooling:
         out = np.zeros([x.shape[0], x.shape[1], H_out, W_out])
 
         for img in range(x.shape[0]):
-            for kernel in range(x.shape[1]):
-                for r in range(H_out):
-                    for c in range(W_out):
+            for r in range(H_out):
+                for c in range(W_out):
+                    for kernel in range(x.shape[1]):
                         # get "snapshot" to apply pooling to
                         receptive_field = x[img, kernel, r * self.stride:r * self.stride + self.kernel_size,
                                             c * self.stride:c * self.stride + self.kernel_size]
@@ -74,9 +74,9 @@ class MaxPooling:
         self.dx = np.zeros(x.shape)
 
         for img in range(x.shape[0]):
-            for kernel in range(x.shape[1]):
-                for r in range(H_out):
-                    for c in range(W_out):
+            for r in range(H_out):
+                for c in range(W_out):
+                    for kernel in range(x.shape[1]):
                         receptive_field = x[img, kernel, r * self.stride:r * self.stride + self.kernel_size,
                                             c * self.stride:c * self.stride + self.kernel_size]
                         # get argmax index and location
