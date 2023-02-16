@@ -123,9 +123,9 @@ class Conv2D:
         dx_padded = np.zeros_like(x_padded)
 
         for img in range(x.shape[0]):
-            for kernel in range(self.out_channels):
-                for r in range(x.shape[2]):
-                    for c in range(x.shape[3]):
+            for r in range(x.shape[2]):
+                for c in range(x.shape[3]):
+                    for kernel in range(self.out_channels):
                         # get single d_out value & multiply by input snapshot
                         dw_field = dout[img, kernel, r, c] * x_padded[img, :, r:r + self.kernel_size,
                                                                       c:c + self.kernel_size]
