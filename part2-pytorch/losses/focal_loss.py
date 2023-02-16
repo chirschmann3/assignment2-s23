@@ -40,7 +40,7 @@ def reweight(cls_num_list, beta=0.9999):
     per_cls_weights = [(1 - beta) / (1 - beta**n) for n in cls_num_list]
 
     # normalize so that sum of "alphas" = # of classes
-    per_cls_weights = [len(per_cls_weights) * a / sum(per_cls_weights) for a in per_cls_weights]
+    per_cls_weights = torch.Tensor([len(per_cls_weights) * a / sum(per_cls_weights) for a in per_cls_weights])
 
     #############################################################################
     #                              END OF YOUR CODE                             #
@@ -67,9 +67,9 @@ class FocalLoss(nn.Module):
 
         #############################################################################
         # below adapted from https://gist.github.com/samson-wang/e5cee676f2ae97795356d9c340d1ec7f
+
         sm = torch.softmax(input, dim=1)
         fl = torch.Tensor(self.weight) * -((1 - sm) ** self.gamma) * torch.log(sm)
-
         # get the loss for only the correct ground truth label
         range_img = torch.arange(0, input.shape[0])
         loss = sum(fl[range_img, target])
