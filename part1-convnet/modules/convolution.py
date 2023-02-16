@@ -73,31 +73,20 @@ class Conv2D:
         W_out = (x.shape[3] + (self.padding * 2) - self.kernel_size) // self.stride + 1
         out = np.zeros([x.shape[0], self.out_channels, H_out, W_out])
 
-        for img in range(x.shape[0]):
-            for r in range(H_out):
-                for c in range(W_out):
+        for img in range(x_padded.shape[0]):
+            img_temp = x_padded[img]
+            s_c, s_h, s_w = img_temp.strides
+            img_vectorized = np.lib.stride_tricks.as_strided(img_temp,
+                                                             shape=(H_out, W_out, self.in_channels,
+                                                                    self.kernel_size, self.kernel_size),
+                                                             strides=(s_h*self.stride, s_w*self.stride, s_c, s_h, s_w),
+                                                             writeable=False)
+            for r in range(img_vectorized.shape[0]):
+                for c in range(img_vectorized.shape[1]):
                     for kernel in range(self.out_channels):
-                        # get "snapshot" to apply kernel to
-                        receptive_field = x_padded[img, :, r * self.stride:r * self.stride + self.kernel_size,
-                                   c * self.stride:c * self.stride + self.kernel_size]
-
-                        # elemwise multiply + sum with kernel
-                        output_temp = np.sum(np.multiply(receptive_field, self.weight[kernel, :, :, :]))
-                        out[img, kernel, r, c] = output_temp + self.bias[kernel]
-
-        # for img in range(x_padded.shape[0]):
-        #     img_temp = x_padded[img]
-        #     s_c, s_h, s_w = img_temp.strides
-        #     img_vectorized = np.lib.stride_tricks.as_strided(img_temp,
-        #                                                      shape=(H_out, W_out, self.in_channels,
-        #                                                             self.kernel_size, self.kernel_size),
-        #                                                      strides=(s_h*self.stride, s_w*self.stride, s_c, s_h, s_w),
-        #                                                      writeable=False)
-        #     for r in range(img_vectorized.shape[0]):
-        #         for c in range(img_vectorized.shape[1]):
-        #             for kern in range(self.out_channels):
-        #                 receptive_field = np.sum(np.multiply(img_vectorized[r, c], self.weight)) + self.bias[kern]
-        #                 out_trial[img, kern, r, c] = receptive_field
+                        receptive_field = np.sum(np.multiply(img_vectorized[r, c], self.weight[kernel])) \
+                                          + self.bias[kernel]
+                        out[img, kernel, r, c] = receptive_field
 
         #############################################################################
         #                              END OF YOUR CODE                             #
@@ -120,7 +109,7 @@ class Conv2D:
 
         x_padded = np.pad(x, ((0, 0), (0, 0), (self.padding, self.padding), (self.padding, self.padding)),
                    'constant', constant_values=0)
-        dx_padded = np.zeros_like(x_padded)
+        dx_padded = np.zeros(x_padded.shape)
 
         for img in range(x.shape[0]):
             for r in range(x.shape[2]):
@@ -133,12 +122,27 @@ class Conv2D:
                         self.dw[kernel, :, :, :] += dw_field
 
                         # single d_out and multiply by kernel weights
-                        dx_field = dout[img, kernel, r, c] * self.weight[kernel, :, :, :]
+                        dx_field = dout[img, kernel, r, c] * self.weight[kernel]
                         # "stamp" onto appropriate location in dx_padded
                         dx_padded[img, :, r:r + self.kernel_size, c:c + self.kernel_size] += dx_field
 
                         # Add d_out to appropriate kernel
                         self.db[kernel] += dout[img, kernel, r, c]
+
+        # for img in range(x.shape[0]):
+        #     img_temp = x_padded[img]
+        #     s_c, s_h, s_w = img_temp.strides
+        #     img_vectorized = np.lib.stride_tricks.as_strided(img_temp,
+        #                                                      shape=(H_out, W_out, self.in_channels,
+        #                                                             self.kernel_size, self.kernel_size),
+        #                                                      strides=(s_h*self.stride, s_w*self.stride, s_c, s_h, s_w),
+        #                                                      writeable=False)
+        #     for r in range(img_vectorized.shape[0]):
+        #         for c in range(img_vectorized.shape[1]):
+        #             for kern in range(self.out_channels):
+        #                 receptive_field = np.sum(np.multiply(img_vectorized[r, c], self.weight[kern])) + self.bias[kern]
+        #                 out[img, kern, r, c] = receptive_field
+
 
         # must remove padding on dx
         self.dx = dx_padded[:, :, self.padding:(x.shape[2])+self.padding, self.padding:(x.shape[3])+self.padding]
